@@ -20,3 +20,20 @@ exports.readMovie = async (filterObject) =>{
         console.log(error)
     }
 }
+
+exports.updateMovie = async (filter, updated) => {
+    try {
+      await Movie.update(updated, { where: filter });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+exports.deleteMovie = async(deleteObject) => {
+    try {
+        await Movie.destroy({where: deleteObject});
+    } catch (error) {
+        console.log(error)
+    }
+}
