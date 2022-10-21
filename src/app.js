@@ -1,33 +1,22 @@
+/////////////////////////////////////////
 const yargs = require('yargs')
 const { sequelize } = require('./db/connection');
 
-const {
-    createMovie,
-    readMovie,
-    updateMovie,
-    deleteMovie,
-} = require ("./movie/movieFunctions");
-const { 
-    createUser,
-    readUser,
-    updateUser,
-    deleteUser
-} = require('./user/userFunctions');
-const {
-    createDirector,
-    readDirector,
-    updateDirector,
-    deleteDirector
-} = require('./director/directorFunction')
+const {createMovie, readMovie, updateMovie, deleteMovie} = require ("./movie/movieFunctions");
+const {createUser,readUser,updateUser,deleteUser} = require('./user/userFunctions');
+const {createDirector,readDirector,updateDirector,deleteDirector} = require('./director/directorFunction')
+const {favMovie, searchMovies, searchUsers} = require("./queries/queries")
+/////////////////////////////////////////
+
 
 const app = async (yargsObject) => {
     try{
         await sequelize.sync();
 
         if (yargsObject.create){
-            // CREATE
+            ////////////////////////  CREATE MOVIE //////////////////////////////
+
             await createMovie({ title: yargsObject.title, actor: yargsObject.actor})
-            // console.log(await readMovie())
             let output = {}
             let table = await readMovie()
             for (let movie of table){
@@ -37,8 +26,10 @@ const app = async (yargsObject) => {
                 console.log(output)
             }
         }
+
+        ////////////////////////  READ MOVIE //////////////////////////////
+
         else if (yargsObject.read){
-            //READ
             //  node src/app.js --read --key title --value "James Bond"
             // console.log(await readMovie({ [yargsObject.key] : yargsObject.value}))
             let output = {}
@@ -59,8 +50,10 @@ const app = async (yargsObject) => {
                 console.log(output)
             }
         }
+
+        ////////////////////////  UPDATE MOVIE //////////////////////////////
+
         else if (yargsObject.update){
-            //UPDATE
             await updateMovie(
               { [yargsObject.key]: yargsObject.value },
               { [yargsObject.updateKey]: yargsObject.updateValue }
@@ -74,11 +67,15 @@ const app = async (yargsObject) => {
                 console.log(output)
             }
         }
+
+        ////////////////////////  DELETE MOVIE //////////////////////////////
+
         else if (yargsObject.delete){
-            //DELETE
             await deleteMovie ({title: yargsObject.title, actor: yargsObject.actor})
         }
-        ///////////////////////////////////////////////////////
+
+        ////////////////////////  CREATE USER //////////////////////////////
+
         else if (yargsObject.createU){
             await createUser({name: yargsObject.name, role: yargsObject.role})
             let output = {}
@@ -90,6 +87,9 @@ const app = async (yargsObject) => {
                 console.log(output)
             }
         }
+
+        ////////////////////////  READ USER //////////////////////////////
+
         else if (yargsObject.readU) {
             let output = {}
             let table = await readUser({ [yargsObject.key1] : yargsObject.value1})
@@ -108,16 +108,24 @@ const app = async (yargsObject) => {
                 console.log(output)
             }
         }
+
+         ////////////////////////  UPDATE USER //////////////////////////////
+
         else if (yargsObject.updateU) {
             await updateUser(
                 {[yargsObject.key]: yargsObject.value},
                 {[yargsObject.updateKey]: yargsObject.updateValue}
                 ); // node src/app.js --update --key name --value "test" --updateKey name --updateValue "cool"
         }
+
+         ////////////////////////  DELETE USER //////////////////////////////
+
         else if (yargsObject.deletU){
             await deleteUser ({name : yargsObject.name, role:yargsObject.role})
         }
-        ////////////////////////////////////////////////
+
+         ////////////////////////  CREATE DIRECTOR //////////////////////////////
+
         else if (yargsObject.createD) {
             await createDirector({name: yargsObject.name})
             let output = {}
@@ -128,6 +136,9 @@ const app = async (yargsObject) => {
                 console.log(output)
             }
         }
+
+        ////////////////////////  READ DIRECTOR //////////////////////////////
+
         else if (yargsObject.readD){
             let output = {}
             let table = await readDirector({ [yargsObject.key] : yargsObject.value})
@@ -144,6 +155,9 @@ const app = async (yargsObject) => {
                 console.log(output)
             }
         }
+
+        ////////////////////////  UPDATE DIRECTOR //////////////////////////////
+
         else if (yargsObject.updateD) {
             await updateDirector(
                 {[yargsObject.key]: yargsObject.value},
@@ -157,14 +171,33 @@ const app = async (yargsObject) => {
                 console.log(output)
             }
         }
+
+        ////////////////////////  DELETE DIRECTOR //////////////////////////////
+        
         else if (yargsObject.deleteD){
             await deleteDirector({name: yargsObject.name})
         }
-        
+
+        //////////////////////// END ////////////////////
+
+        //////////////////////////// Search ////////////////
+
+        else if (yargsObject.searchMovies) {
+            await searchMovies({key: yargsObject.key, value: yargsObject.value})
+        }
+
+        else if (yargsObject.searchUsers){
+            await searchUsers({key: yargsObject.key, value: yargsObject.value})
+        }
+
+        else if (yargsObject.favMovie) {
+            await favMovie({key: yargsObject.key, value: yargsObject.value})
+
+        }
+
         else {
             console.log("incorrect command")
         }
-
         await sequelize.close(); // close or break
     } catch (error){
         console.log(error)
